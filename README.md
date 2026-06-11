@@ -11,6 +11,28 @@
 
 ---
 
+## 📸 Preview
+
+### Login Page
+![Login Page](screenshots/loginpage.png)
+
+### SignUp Page
+![SignUp Page](screenshots/signuppage.png)
+
+### Home Page
+![Home Page](screenshots/homepage.png)
+
+### Messages Page
+![Messages Page](screenshots/messages.png)
+
+### Settings Page
+![Settings Page](screenshots/settings.png)
+
+### PostCreation Page
+![PostCreation Page](screenshots/post.png)
+
+---
+
 ## Project Structure
 
 ```
