@@ -16,9 +16,6 @@
 ### Login Page
 ![Login Page](screenshots/loginpage.png)
 
-### SignUp Page
-![SignUp Page](screenshots/signuppage.png)
-
 ### Home Page
 ![Home Page](screenshots/homepage.png)
 
