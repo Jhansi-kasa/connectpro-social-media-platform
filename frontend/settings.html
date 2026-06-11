@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectPro - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background: #B0E0E6; font-family: 'Poppins', sans-serif; }
+
+        .settings-page-wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* ── Top bar ── */
+        .settings-topbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+        }
+        .settings-topbar h1 { font-size: 1.5rem; color: blue; margin: 0; }
+        .back-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-size: 1rem;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-btn:hover { background: #f0f0f0; }
+
+        /* ── Layout ── */
+        .settings-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        /* ── Sidebar nav ── */
+        .settings-nav {
+            background: #f0f0f0;
+            border-radius: 16px;
+            padding: 1rem 0;
+            width: 220px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 1rem;
+        }
+        .settings-nav button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.92rem;
+            color: #333;
+            text-align: left;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+        }
+        .settings-nav button:hover { background: #e4e4e4; color: blue; }
+        .settings-nav button.active {
+            background: #e0eaff;
+            color: blue;
+            border-left-color: blue;
+            font-weight: 600;
+        }
+        .settings-nav button i { width: 18px; text-align: center; }
+        .nav-divider {
+            height: 1px;
+            background: #ddd;
+            margin: 8px 0;
+        }
+        .nav-danger button { color: #dc2626 !important; }
+        .nav-danger button:hover { background: #fee2e2 !important; }
+
+        /* ── Content panels ── */
+        .settings-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .settings-panel {
+            background: #f0f0f0;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: none;
+        }
+        .settings-panel.active { display: block; }
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .panel-title i { color: blue; }
+
+        /* ── Form elements ── */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+            transition: border 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { outline: none; border-color: blue; }
+        .form-group .hint {
+            font-size: 0.78rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .char-count {
+            font-size: 0.75rem;
+            color: #aaa;
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* ── Toggle switches ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-info { flex: 1; }
+        .toggle-info strong { display: block; font-size: 0.92rem; color: #222; }
+        .toggle-info span { font-size: 0.8rem; color: #888; }
+        .toggle-switch {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #ccc;
+            border-radius: 26px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            left: 3px; top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: blue; }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            background: blue;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: darkblue; }
+        .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+        .btn-secondary {
+            background: white;
+            color: blue;
+            border: 2px solid blue;
+            border-radius: 30px;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: blue; color: white; }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── Avatar upload ── */
+        .avatar-upload-area {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .avatar-preview {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+        }
+        .avatar-preview img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 28px; height: 28px;
+            background: blue;
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .avatar-upload-info { font-size: 0.82rem; color: #666; }
+        .avatar-upload-info strong { display: block; margin-bottom: 4px; color: #333; }
+
+        /* ── Cover photo ── */
+        .cover-preview {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #B0E0E6, #4fc3f7);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .cover-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .cover-edit-btn {
+            position: absolute;
+            bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ── Section heading ── */
+        .section-heading {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #888;
+            margin: 1.25rem 0 0.75rem;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #22c55e; }
+        .toast.error   { background: #ef4444; }
+        .toast.warning { background: #f59e0b; }
+
+        /* ── Blocked users list ── */
+        .blocked-user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .blocked-user-item img {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .blocked-user-item .info { flex: 1; }
+        .blocked-user-item .info strong { display: block; font-size: 0.9rem; }
+        .blocked-user-item .info span { font-size: 0.8rem; color: #888; }
+        .unblock-btn {
+            border: 1.5px solid #ef4444;
+            color: #ef4444;
+            background: none;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .unblock-btn:hover { background: #ef4444; color: white; }
+
+        /* ── Danger zone ── */
+        .danger-zone {
+            border: 1.5px solid #fca5a5;
+            border-radius: 12px;
+            padding: 1.25rem;
+            background: #fff5f5;
+        }
+        .danger-zone h4 { color: #dc2626; margin-bottom: 0.5rem; }
+        .danger-zone p { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .settings-layout { flex-direction: column; }
+            .settings-nav { width: 100%; position: static; display: flex; overflow-x: auto; padding: 0.5rem; }
+            .settings-nav button { flex-shrink: 0; padding: 10px 14px; border-left: none; border-bottom: 3px solid transparent; }
+            .settings-nav button.active { border-left: none; border-bottom-color: blue; }
+            .nav-divider { width: 1px; height: auto; margin: 0 4px; }
+        }
+    </style>
+</head>
+<body>
+<div class="settings-page-wrapper">
+    <!-- Top bar -->
+    <div class="settings-topbar">
+        <a href="home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1><i class="fa-solid fa-gear"></i> Settings</h1>
+    </div>
+
+    <div class="settings-layout">
+        <!-- Sidebar nav -->
+        <nav class="settings-nav" id="settings-nav">
+            <button class="active" onclick="showPanel('profile')">
+                <i class="fa-solid fa-user-pen"></i> Edit Profile
+            </button>
+            <button onclick="showPanel('account')">
+                <i class="fa-solid fa-id-card"></i> Account
+            </button>
+            <div class="nav-divider"></div>
+            <button onclick="showPanel('privacy')">
+                <i class="fa-solid fa-shield-halved"></i> Privacy
+            </button>
+            <button onclick="showPanel('notifications')">
+                <i class="fa-solid fa-bell"></i> Notifications
+            </button>
+            <button onclick="showPanel('security')">
+                <i class="fa-solid fa-key"></i> Security
+            </button>
+            <button onclick="showPanel('appearance')">
+                <i class="fa-solid fa-palette"></i> Appearance
+            </button>
+            <button onclick="showPanel('blocked')">
+                <i class="fa-solid fa-ban"></i> Blocked Users
+            </button>
+            <div class="nav-divider"></div>
+            <div class="nav-danger">
+                <button onclick="showPanel('danger')">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Account Actions
+                </button>
+                <button onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Content panels -->
+        <div class="settings-content">
+
+            <!-- ── PROFILE ── -->
+            <div class="settings-panel active" id="panel-profile">
+                <div class="panel-title"><i class="fa-solid fa-user-pen"></i> Edit Profile</div>
+
+                <!-- Avatar -->
+                <div class="avatar-upload-area">
+                    <div class="avatar-preview">
+                        <img src="" alt="Avatar" id="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                        <div class="avatar-edit-btn" onclick="document.getElementById('avatar-input').click()">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+                    </div>
+                    <div class="avatar-upload-info">
+                        <strong>Profile Photo</strong>
+                        Click the camera icon to change.<br>
+                        JPG, PNG or WebP. Max 5MB.
+                    </div>
+                </div>
+
+                <!-- Cover photo -->
+                <div class="form-group">
+                    <label>Cover Photo</label>
+                    <div class="cover-preview" id="cover-preview">
+                        <img src="" alt="Cover" id="cover-img" onerror="this.style.display='none'" style="display:none">
+                        <button class="cover-edit-btn" onclick="document.getElementById('cover-input').click()">
+                            <i class="fa-solid fa-camera"></i> Change Cover
+                        </button>
+                    </div>
+                    <input type="file" id="cover-input" accept="image/*" style="display:none" onchange="uploadCover(this)">
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="profile-name" placeholder="Your name" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="profile-username" placeholder="yourusername" maxlength="30">
+                    <div class="hint">Only letters, numbers, dots and underscores.</div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea id="profile-bio" placeholder="Tell people about yourself..." maxlength="160" oninput="updateCharCount(this,'bio-count',160)"></textarea>
+                    <div class="char-count"><span id="bio-count">0</span>/160</div>
+                </div>
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="url" id="profile-website" placeholder="https://yourwebsite.com">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="profile-location" placeholder="City, Country" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="profile-gender">
+                        <option value="">Prefer not to say</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+                    <button class="btn-secondary" onclick="loadProfile()">Discard</button>
+                </div>
+            </div>
+
+            <!-- ── ACCOUNT ── -->
+            <div class="settings-panel" id="panel-account">
+                <div class="panel-title"><i class="fa-solid fa-id-card"></i> Account Settings</div>
+
+                <div class="section-heading">Email Address</div>
+                <div class="form-group">
+                    <label>Current Email</label>
+                    <input type="email" id="current-email" placeholder="your@email.com">
+                    <div class="hint" id="email-verified-status"></div>
+                </div>
+                <div class="form-group">
+                    <label>New Email</label>
+                    <input type="email" id="new-email" placeholder="newemail@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Confirm with Password</label>
+                    <input type="password" id="email-change-password" placeholder="Your current password">
+                </div>
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="updateEmail()">Update Email</button>
+                </div>
+            </div>
+
+            <!-- ── PRIVACY ── -->
+            <div class="settings-panel" id="panel-privacy">
+                <div class="panel-title"><i class="fa-solid fa-shield-halved"></i> Privacy Settings</div>
+
+                <div class="section-heading">Profile Visibility</div>
+                <div class="form-group">
+                    <label>Who can see your profile?</label>
+                    <select id="privacy-visibility">
+                        <option value="public">Everyone (Public)</option>
+                        <option value="followers">Followers Only</option>
+                        <option value="private">Only Me (Private)</option>
+                    </select>
+                    <div class="hint">Private profiles require approval before others can follow you.</div>
+                </div>
+                <div class="form-group">
+                    <label>Who can send you messages?</label>
+                    <select id="privacy-messages">
+                        <option value="everyone">Everyone</option>
+                        <option value="followers">Followers Only</option>
+                        <option value="none">No One</option>
+                    </select>
+                </div>
+
+                <div class="section-heading">Visibility Options</div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Show Followers Count</strong>
+                        <span>Let others see how many followers you have</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="privacy-show-followers" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Show Following Count</strong>
+                        <span>Let others see who you're following</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="privacy-show-following" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Allow Tagging</strong>
+                        <span>Let others tag you in posts</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="privacy-tagging" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Show Location</strong>
+                        <span>Display your location on your profile</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="privacy-location" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="savePrivacy()">Save Privacy Settings</button>
+                </div>
+            </div>
+
+            <!-- ── NOTIFICATIONS ── -->
+            <div class="settings-panel" id="panel-notifications">
+                <div class="panel-title"><i class="fa-solid fa-bell"></i> Notification Preferences</div>
+
+                <div class="section-heading">Activity Notifications</div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Likes</strong>
+                        <span>When someone likes your post</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-likes" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Comments</strong>
+                        <span>When someone comments on your post</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-comments" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Follows</strong>
+                        <span>When someone follows you</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-follows" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Messages</strong>
+                        <span>When you receive a new message</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-messages" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Mentions</strong>
+                        <span>When someone mentions you in a post</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-mentions" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+
+                <div class="section-heading">Delivery</div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Email Notifications</strong>
+                        <span>Receive notifications via email</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-email" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <strong>Push Notifications</strong>
+                        <span>Receive push notifications in browser</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notif-push" checked>
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="saveNotifications()">Save Preferences</button>
+                </div>
+            </div>
+
+            <!-- ── SECURITY ── -->
+            <div class="settings-panel" id="panel-security">
+                <div class="panel-title"><i class="fa-solid fa-key"></i> Security</div>
+
+                <div class="section-heading">Change Password</div>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="sec-current-pw" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="sec-new-pw" placeholder="Min 8 chars, 1 uppercase, 1 number">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="sec-confirm-pw" placeholder="Repeat new password">
+                </div>
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="changePassword()">Update Password</button>
+                </div>
+
+                <div class="section-heading" style="margin-top:2rem;">Sessions</div>
+                <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+                    Changing your password will automatically sign you out of all other devices.
+                </p>
+                <button class="btn-secondary" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out of All Devices
+                </button>
+            </div>
+
+            <!-- ── APPEARANCE ── -->
+            <div class="settings-panel" id="panel-appearance">
+                <div class="panel-title"><i class="fa-solid fa-palette"></i> Appearance</div>
+
+                <div class="section-heading">Theme</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1.5rem;">
+                    <button class="theme-option" id="theme-light" onclick="setTheme('light')">
+                        <i class="fa-solid fa-sun"></i> Light
+                    </button>
+                    <button class="theme-option" id="theme-dark" onclick="setTheme('dark')">
+                        <i class="fa-solid fa-moon"></i> Dark
+                    </button>
+                    <button class="theme-option active" id="theme-system" onclick="setTheme('system')">
+                        <i class="fa-solid fa-circle-half-stroke"></i> System
+                    </button>
+                </div>
+
+                <div class="section-heading">Language</div>
+                <div class="form-group">
+                    <select id="appearance-language" onchange="saveLanguage()">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="ta">தமிழ்</option>
+                    </select>
+                </div>
+
+                <style>
+                    .theme-option {
+                        padding: 10px 20px;
+                        border: 2px solid #ddd;
+                        border-radius: 10px;
+                        background: white;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.2s;
+                    }
+                    .theme-option:hover { border-color: blue; color: blue; }
+                    .theme-option.active { border-color: blue; background: #e0eaff; color: blue; font-weight: 600; }
+                </style>
+            </div>
+
+            <!-- ── BLOCKED USERS ── -->
+            <div class="settings-panel" id="panel-blocked">
+                <div class="panel-title"><i class="fa-solid fa-ban"></i> Blocked Users</div>
+                <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+                    Blocked users cannot see your profile, posts, or send you messages.
+                </p>
+                <div id="blocked-users-list">
+                    <p style="color:#aaa;text-align:center;padding:2rem 0;">Loading...</p>
+                </div>
+            </div>
+
+            <!-- ── DANGER ZONE ── -->
+            <div class="settings-panel" id="panel-danger">
+                <div class="panel-title"><i class="fa-solid fa-triangle-exclamation"></i> Account Actions</div>
+
+                <div class="danger-zone" style="margin-bottom:1.5rem;">
+                    <h4><i class="fa-solid fa-pause"></i> Deactivate Account</h4>
+                    <p>
+                        Temporarily disable your account. Your profile and posts will be hidden.
+                        You can reactivate by logging back in at any time.
+                    </p>
+                    <button class="btn-secondary" onclick="deactivateAccount()" style="border-color:#f59e0b;color:#f59e0b;">
+                        Deactivate Account
+                    </button>
+                </div>
+
+                <div class="danger-zone">
+                    <h4><i class="fa-solid fa-trash"></i> Delete Account</h4>
+                    <p>
+                        Permanently delete your account and all your data. This action
+                        <strong>cannot be undone</strong>. All posts, messages, and followers will be lost.
+                    </p>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label>Enter your password to confirm</label>
+                        <input type="password" id="delete-password" placeholder="Your password">
+                    </div>
+                    <button class="btn-danger" onclick="deleteAccount()">
+                        <i class="fa-solid fa-trash"></i> Permanently Delete Account
+                    </button>
+                </div>
+            </div>
+
+        </div><!-- /settings-content -->
+    </div><!-- /settings-layout -->
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = 'http://localhost:5000/api';
+
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+const getToken = () => localStorage.getItem('accessToken');
+const getUser  = () => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } };
+const setUser  = (u) => localStorage.setItem('user', JSON.stringify(u));
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3200);
+}
+
+// ── API request helper ────────────────────────────────────────────────────────
+async function api(method, endpoint, data = null, isForm = false) {
+    const token = getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (!isForm && data) headers['Content-Type'] = 'application/json';
+
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+        method,
+        headers,
+        credentials: 'include',
+        body: isForm ? data : data ? JSON.stringify(data) : undefined,
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message || 'Request failed');
+    return json;
+}
+
+// ── Panel navigation ──────────────────────────────────────────────────────────
+function showPanel(name) {
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.settings-nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`panel-${name}`)?.classList.add('active');
+    event?.currentTarget?.classList.add('active');
+
+    if (name === 'blocked') loadBlockedUsers();
+}
+
+// ── Char counter ──────────────────────────────────────────────────────────────
+function updateCharCount(el, countId, max) {
+    document.getElementById(countId).textContent = el.value.length;
+}
+
+// ── Load profile ──────────────────────────────────────────────────────────────
+async function loadProfile() {
+    try {
+        const res = await api('GET', '/auth/me');
+        const user = res.data.user;
+        setUser(user);
+
+        document.getElementById('profile-name').value     = user.name || '';
+        document.getElementById('profile-username').value = user.username || '';
+        document.getElementById('profile-bio').value      = user.bio || '';
+        document.getElementById('profile-website').value  = user.website || '';
+        document.getElementById('profile-location').value = user.location || '';
+        document.getElementById('profile-gender').value   = user.gender || '';
+
+        document.getElementById('bio-count').textContent = (user.bio || '').length;
+
+        const avatarImg = document.getElementById('avatar-img');
+        avatarImg.src = user.avatar?.url ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=random&size=90`;
+
+        if (user.coverPhoto?.url) {
+            const coverImg = document.getElementById('cover-img');
+            coverImg.src = user.coverPhoto.url;
+            coverImg.style.display = 'block';
+        }
+
+        // Account panel
+        document.getElementById('current-email').value = user.email || '';
+        const verifiedEl = document.getElementById('email-verified-status');
+        verifiedEl.textContent = user.isEmailVerified ? '✅ Email verified' : '⚠️ Email not verified';
+        verifiedEl.style.color = user.isEmailVerified ? '#16a34a' : '#f59e0b';
+
+        // Privacy panel
+        const p = user.settings?.privacy || {};
+        document.getElementById('privacy-visibility').value   = p.profileVisibility || 'public';
+        document.getElementById('privacy-messages').value     = p.allowMessagesFrom || 'everyone';
+        document.getElementById('privacy-show-followers').checked = p.showFollowers !== false;
+        document.getElementById('privacy-show-following').checked = p.showFollowing !== false;
+        document.getElementById('privacy-tagging').checked        = p.allowTagging !== false;
+        document.getElementById('privacy-location').checked       = p.showLocation !== false;
+
+        // Notifications panel
+        const n = user.settings?.notifications || {};
+        document.getElementById('notif-likes').checked    = n.likes !== false;
+        document.getElementById('notif-comments').checked = n.comments !== false;
+        document.getElementById('notif-follows').checked  = n.follows !== false;
+        document.getElementById('notif-messages').checked = n.messages !== false;
+        document.getElementById('notif-mentions').checked = n.mentions !== false;
+        document.getElementById('notif-email').checked    = n.email !== false;
+        document.getElementById('notif-push').checked     = n.push !== false;
+
+        // Appearance
+        const theme = user.settings?.theme || 'system';
+        setThemeUI(theme);
+        document.getElementById('appearance-language').value = user.settings?.language || 'en';
+
+    } catch (err) {
+        showToast('Failed to load profile. Please refresh.', 'error');
+    }
+}
+
+// ── Save profile ──────────────────────────────────────────────────────────────
+async function saveProfile() {
+    try {
+        const data = {
+            name:     document.getElementById('profile-name').value.trim(),
+            username: document.getElementById('profile-username').value.trim().toLowerCase(),
+            bio:      document.getElementById('profile-bio').value.trim(),
+            website:  document.getElementById('profile-website').value.trim(),
+            location: document.getElementById('profile-location').value.trim(),
+            gender:   document.getElementById('profile-gender').value,
+        };
+        const res = await api('PUT', '/users/me/profile', data);
+        setUser(res.data.user);
+        showToast('Profile saved successfully!');
+    } catch (err) {
+        showToast(err.message || 'Failed to save profile.', 'error');
+    }
+}
+
+// ── Avatar upload ─────────────────────────────────────────────────────────────
+async function uploadAvatar(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5MB.', 'error'); return; }
+
+    // Preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => { document.getElementById('avatar-img').src = e.target.result; };
+    reader.readAsDataURL(file);
+
+    try {
+        const form = new FormData();
+        form.append('avatar', file);
+        const res = await api('PUT', '/users/me/avatar', form, true);
+        showToast('Profile photo updated!');
+        // Update stored user
+        const user = getUser();
+        if (user) { user.avatar = res.data.avatar; setUser(user); }
+    } catch (err) {
+        showToast(err.message || 'Failed to upload photo.', 'error');
+    }
+}
+
+// ── Cover upload ──────────────────────────────────────────────────────────────
+async function uploadCover(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = document.getElementById('cover-img');
+        img.src = e.target.result;
+        img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+
+    try {
+        const form = new FormData();
+        form.append('cover', file);
+        await api('PUT', '/users/me/cover', form, true);
+        showToast('Cover photo updated!');
+    } catch (err) {
+        showToast(err.message || 'Failed to upload cover.', 'error');
+    }
+}
+
+// ── Update email ──────────────────────────────────────────────────────────────
+async function updateEmail() {
+    const email    = document.getElementById('new-email').value.trim();
+    const password = document.getElementById('email-change-password').value;
+    if (!email || !password) { showToast('Fill in all fields.', 'error'); return; }
+    try {
+        await api('PUT', '/settings/email', { email, password });
+        showToast('Email updated! Please verify your new email.');
+        document.getElementById('current-email').value = email;
+        document.getElementById('new-email').value = '';
+        document.getElementById('email-change-password').value = '';
+    } catch (err) {
+        showToast(err.message || 'Failed to update email.', 'error');
+    }
+}
+
+// ── Save privacy ──────────────────────────────────────────────────────────────
+async function savePrivacy() {
+    try {
+        await api('PUT', '/settings/privacy', {
+            profileVisibility:  document.getElementById('privacy-visibility').value,
+            allowMessagesFrom:  document.getElementById('privacy-messages').value,
+            showFollowers:      document.getElementById('privacy-show-followers').checked,
+            showFollowing:      document.getElementById('privacy-show-following').checked,
+            allowTagging:       document.getElementById('privacy-tagging').checked,
+            showLocation:       document.getElementById('privacy-location').checked,
+        });
+        showToast('Privacy settings saved!');
+    } catch (err) {
+        showToast(err.message || 'Failed to save privacy settings.', 'error');
+    }
+}
+
+// ── Save notifications ────────────────────────────────────────────────────────
+async function saveNotifications() {
+    try {
+        await api('PUT', '/settings/notifications', {
+            likes:    document.getElementById('notif-likes').checked,
+            comments: document.getElementById('notif-comments').checked,
+            follows:  document.getElementById('notif-follows').checked,
+            messages: document.getElementById('notif-messages').checked,
+            mentions: document.getElementById('notif-mentions').checked,
+            email:    document.getElementById('notif-email').checked,
+            push:     document.getElementById('notif-push').checked,
+        });
+        showToast('Notification preferences saved!');
+    } catch (err) {
+        showToast(err.message || 'Failed to save notifications.', 'error');
+    }
+}
+
+// ── Change password ───────────────────────────────────────────────────────────
+async function changePassword() {
+    const currentPassword = document.getElementById('sec-current-pw').value;
+    const newPassword     = document.getElementById('sec-new-pw').value;
+    const confirmPassword = document.getElementById('sec-confirm-pw').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showToast('Please fill in all password fields.', 'error'); return;
+    }
+    if (newPassword !== confirmPassword) {
+        showToast('New passwords do not match.', 'error'); return;
+    }
+    if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+        showToast('Password must be 8+ chars with 1 uppercase and 1 number.', 'error'); return;
+    }
+
+    try {
+        await api('PUT', '/auth/change-password', { currentPassword, newPassword, confirmPassword });
+        showToast('Password changed! Logging you out...');
+        setTimeout(() => {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }, 2000);
+    } catch (err) {
+        showToast(err.message || 'Failed to change password.', 'error');
+    }
+}
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+function setThemeUI(theme) {
+    document.querySelectorAll('.theme-option').forEach(b => b.classList.remove('active'));
+    document.getElementById(`theme-${theme}`)?.classList.add('active');
+
+    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('theme');
+    } else {
+        document.body.classList.remove('theme');
+    }
+}
+
+async function setTheme(theme) {
+    setThemeUI(theme);
+    try {
+        await api('PUT', '/settings/theme', { theme });
+        showToast(`Theme set to ${theme}.`);
+        const user = getUser();
+        if (user?.settings) { user.settings.theme = theme; setUser(user); }
+    } catch (err) {
+        showToast(err.message || 'Failed to save theme.', 'error');
+    }
+}
+
+async function saveLanguage() {
+    const language = document.getElementById('appearance-language').value;
+    try {
+        await api('PUT', '/settings/language', { language });
+        showToast('Language updated.');
+    } catch (err) {
+        showToast(err.message || 'Failed to update language.', 'error');
+    }
+}
+
+// ── Blocked users ─────────────────────────────────────────────────────────────
+async function loadBlockedUsers() {
+    const container = document.getElementById('blocked-users-list');
+    try {
+        const res = await api('GET', '/users/me/blocked');
+        const users = res.data.users;
+
+        if (!users.length) {
+            container.innerHTML = '<p style="color:#aaa;text-align:center;padding:2rem 0;">You haven\'t blocked anyone.</p>';
+            return;
+        }
+
+        container.innerHTML = users.map(u => `
+            <div class="blocked-user-item" id="blocked-${u._id}">
+                <img src="${u.avatar?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=random`}" alt="${u.name}">
+                <div class="info">
+                    <strong>${u.name}</strong>
+                    <span>@${u.username}</span>
+                </div>
+                <button class="unblock-btn" onclick="unblockUser('${u._id}')">Unblock</button>
+            </div>
+        `).join('');
+    } catch (err) {
+        container.innerHTML = '<p style="color:#ef4444;text-align:center;padding:2rem 0;">Failed to load blocked users.</p>';
+    }
+}
+
+async function unblockUser(userId) {
+    try {
+        await api('DELETE', `/users/${userId}/block`);
+        document.getElementById(`blocked-${userId}`)?.remove();
+        showToast('User unblocked.');
+        // Check if list is now empty
+        const list = document.getElementById('blocked-users-list');
+        if (!list.querySelector('.blocked-user-item')) {
+            list.innerHTML = '<p style="color:#aaa;text-align:center;padding:2rem 0;">You haven\'t blocked anyone.</p>';
+        }
+    } catch (err) {
+        showToast(err.message || 'Failed to unblock user.', 'error');
+    }
+}
+
+// ── Deactivate ────────────────────────────────────────────────────────────────
+async function deactivateAccount() {
+    if (!confirm('Deactivate your account? You can reactivate by logging in again.')) return;
+    try {
+        await api('PUT', '/users/me/deactivate');
+        showToast('Account deactivated. Goodbye!', 'warning');
+        setTimeout(() => {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }, 2000);
+    } catch (err) {
+        showToast(err.message || 'Failed to deactivate.', 'error');
+    }
+}
+
+// ── Delete account ────────────────────────────────────────────────────────────
+async function deleteAccount() {
+    const password = document.getElementById('delete-password').value;
+    if (!password) { showToast('Please enter your password.', 'error'); return; }
+    if (!confirm('This will PERMANENTLY delete your account. There is no going back. Are you sure?')) return;
+    try {
+        await api('DELETE', '/users/me/delete', { password });
+        showToast('Account deleted. Goodbye.', 'warning');
+        setTimeout(() => {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }, 2000);
+    } catch (err) {
+        showToast(err.message || 'Failed to delete account. Check your password.', 'error');
+    }
+}
+
+// ── Logout ────────────────────────────────────────────────────────────────────
+async function handleLogout() {
+    if (!confirm('Sign out of ConnectPro?')) return;
+    try { await api('POST', '/auth/logout'); } catch (_) {}
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) { window.location.href = 'index.html'; return; }
+    loadProfile();
+});
+</script>
+</body>
+</html>

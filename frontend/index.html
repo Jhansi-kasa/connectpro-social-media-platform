@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectPro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .error-msg {
+            background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
+            border-radius: 8px; padding: 10px 14px; font-size: 0.85rem;
+            display: none; width: 85%; margin-bottom: 1rem; box-sizing: border-box;
+        }
+        .input-wrap { position: relative; width: 100%; max-width: 300px; }
+        .input-wrap .toggle-pw {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: #888;
+        }
+        .login-button:disabled { background: #aaa; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="logincontainer">
+        <img src="images/loginimg.jpg" alt="Login Image" class="login-image" onerror="this.style.display='none'">
+        <div class="loginpage">
+            <h1>ConnectPro</h1>
+            <p>Your gateway to seamless connectivity.</p>
+
+            <div class="error-msg" id="error-msg"></div>
+
+            <input type="text" id="email" placeholder="Email" class="input-field" autocomplete="email">
+
+            <div class="input-wrap">
+                <input type="password" id="password" placeholder="Password" class="input-field" autocomplete="current-password" style="max-width:none;">
+                <i class="fa-solid fa-eye toggle-pw" id="toggle-pw" onclick="togglePw()"></i>
+            </div>
+
+            <button id="login-btn" onclick="handleLogin()" class="login-button">Login</button>
+            <p style="margin-bottom:2rem;" class="signup-link">Don't have an account? </p>
+            <button onclick="window.location.href='signup.html'" class="signup-button">Create new account</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function togglePw() {
+            const input = document.getElementById('password');
+            const icon  = document.getElementById('toggle-pw');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash toggle-pw';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye toggle-pw';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        async function handleLogin() {
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('login-btn');
+
+            document.getElementById('error-msg').style.display = 'none';
+
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Logging in...';
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    showError(data.message || 'Invalid email or password.');
+                    btn.disabled = false;
+                    btn.textContent = 'Login';
+                    return;
+                }
+
+                localStorage.setItem('accessToken', data.data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.data.user));
+                window.location.href = 'home.html';
+
+            } catch (err) {
+                showError('Network error. Is the server running on port 5000?');
+                btn.disabled = false;
+                btn.textContent = 'Login';
+            }
+        }
+
+        document.getElementById('password')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        // Redirect if already logged in
+        if (localStorage.getItem('accessToken')) {
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>

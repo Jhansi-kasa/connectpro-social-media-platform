@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectPro - Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ── Notification badge ── */
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: red; color: #fff; border-radius: 50%;
+            width: 18px; height: 18px; font-size: 11px;
+            display: none; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .notif-badge.show { display: flex; }
+        .sidebar li { position: relative; }
+
+        /* ── Post cards ── */
+        .post-container { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+        .post-actions-menu {
+            position: absolute; top: 40px; right: 10px;
+            background: white; border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 100; display: none; min-width: 140px;
+            border: 1px solid #eee;
+        }
+        .post-actions-menu.show { display: block; }
+        .post-actions-menu button {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; padding: 10px 16px; border: none;
+            background: none; cursor: pointer; font-size: 0.88rem;
+            color: #333; text-align: left;
+        }
+        .post-actions-menu button:hover { background: #f5f5f5; }
+        .post-actions-menu button.danger { color: #ef4444; }
+        .post-wrapper { position: relative; }
+
+        /* ── Profile card ── */
+        .profilecard { gap: 1rem !important; }
+        .profile-stats { display: flex; gap: 1.5rem; justify-content: center; }
+        .profile-stat { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .profile-stat:hover h5 { color: blue; }
+        .profile-posts-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 4px; width: 100%; margin-top: 0.5rem;
+        }
+        .profile-posts-grid img {
+            width: 100%; aspect-ratio: 1; object-fit: cover;
+            border-radius: 4px; cursor: pointer;
+        }
+        .profile-posts-grid .no-posts {
+            grid-column: 1/-1; text-align: center;
+            color: #aaa; padding: 1rem; font-size: 0.85rem;
+        }
+
+        /* ── Explore ── */
+        .explore-tabs {
+            display: flex; gap: 8px; margin-bottom: 1rem;
+            border-bottom: 2px solid #ddd; padding-bottom: 0;
+        }
+        .explore-tab {
+            padding: 8px 16px; border: none; background: none;
+            cursor: pointer; font-size: 0.9rem; color: #666;
+            border-bottom: 2px solid transparent; margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .explore-tab.active { color: blue; border-bottom-color: blue; font-weight: 600; }
+
+        /* ── Chat ── */
+        .chat-messages {
+            flex: 1; overflow-y: auto; display: flex;
+            flex-direction: column; gap: 8px; padding: 8px 0;
+            max-height: calc(100vh - 200px);
+        }
+        .msg-bubble {
+            max-width: 75%; padding: 8px 14px; border-radius: 18px;
+            font-size: 0.9rem; word-break: break-word;
+        }
+        .msg-mine { background: blue; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-theirs { background: #e0e0e0; color: #222; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-deleted { color: #aaa; font-style: italic; font-size: 0.8rem; }
+        .msg-time { font-size: 0.7rem; color: #aaa; margin: 0 6px; }
+        .typing-indicator { color: #888; font-size: 0.8rem; padding: 4px 8px; display: none; }
+        .chat-input-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px; border-top: 1px solid #eee; margin-top: auto;
+        }
+        .chat-input-row input {
+            flex: 1; padding: 10px 14px; border-radius: 20px;
+            border: 1.5px solid #ddd; outline: none; font-size: 0.9rem;
+        }
+        .chat-input-row input:focus { border-color: blue; }
+        .chat-send-btn {
+            background: blue; color: white; border: none;
+            border-radius: 50%; width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+
+        /* ── Notifications ── */
+        .notif-mark-read {
+            background: none; border: none; color: blue;
+            font-size: 0.8rem; cursor: pointer; margin-left: auto;
+        }
+        .notification-item.unread { background: #eef4ff; border-radius: 8px; }
+        .notification-item { cursor: pointer; transition: background 0.2s; }
+        .notification-item:hover { background: #f5f5f5; border-radius: 8px; }
+
+        /* ── Suggested users ── */
+        .suggested-section {
+            background: #f0f0f0; border-radius: 10px;
+            padding: 12px; margin-top: 1rem;
+        }
+        .suggested-title { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 10px; }
+        .suggested-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0; border-bottom: 1px solid #eee;
+        }
+        .suggested-item:last-child { border-bottom: none; }
+        .suggested-item img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .suggested-info { flex: 1; }
+        .suggested-info strong { font-size: 0.85rem; display: block; }
+        .suggested-info span { font-size: 0.75rem; color: #888; }
+        .suggested-follow-btn {
+            border: 1.5px solid blue; color: blue; background: none;
+            border-radius: 20px; padding: 4px 12px; font-size: 0.78rem;
+            cursor: pointer; white-space: nowrap;
+        }
+        .suggested-follow-btn:hover { background: blue; color: white; }
+        .suggested-follow-btn.following { background: blue; color: white; }
+
+        /* ── Loading spinner ── */
+        .spinner {
+            text-align: center; padding: 2rem; color: #aaa; font-size: 0.9rem;
+        }
+        .spinner i { font-size: 1.5rem; animation: spin 1s linear infinite; display: block; margin-bottom: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center; padding: 3rem 1rem; color: #aaa;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+        /* ── Search results overlay ── */
+        .search-results {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 500; max-height: 400px; overflow-y: auto;
+            display: none;
+        }
+        .search-results.show { display: block; }
+        .search-result-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+        .search-result-item:hover { background: #f8f8f8; }
+        .search-result-item img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .search-result-info strong { font-size: 0.9rem; display: block; }
+        .search-result-info span { font-size: 0.78rem; color: #888; }
+        .search-no-results { padding: 1rem; text-align: center; color: #aaa; font-size: 0.9rem; }
+
+        /* ── Follow/unfollow btn states ── */
+        .followbtn.following { background: white; color: blue; border: 2px solid blue; }
+        .followbtn.pending { background: #f59e0b; border-color: #f59e0b; color: white; }
+
+        /* ── Toast ── */
+        .cp-toast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            padding: 12px 20px; border-radius: 10px; font-size: 14px;
+            color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease; max-width: 300px;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+        /* ── Online dot ── */
+        .online-dot {
+            width: 10px; height: 10px; background: #22c55e;
+            border-radius: 50%; border: 2px solid white;
+            position: absolute; bottom: 0; right: 0;
+        }
+        .msg-avatar-wrap { position: relative; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+<div class="home-container">
+    <!-- ── HEADER ── -->
+    <div class="header">
+        <div class="title">
+            <button onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+            <h1>ConnectPro</h1>
+        </div>
+        <div class="search" style="position:relative;">
+            <input type="text" id="search-bar" placeholder="Search users..." class="search-bar" autocomplete="off">
+            <button onclick="doSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="search-results"></div>
+        </div>
+        <button class="profile" onclick="profileview(); return false;">
+            <img src="images/userprofile.jpg" alt="User Profile" class="profile-image" id="header-avatar">
+        </button>
+    </div>
+
+    <div class="dashboard-container" id="dashboard-container">
+
+        <!-- ── SIDEBAR ── -->
+        <div class="hide sidebar" id="sidebar">
+            <ul>
+                <li><a href="home.html" class="home"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#" onclick="showExplore(); return false;"><i class="fa-solid fa-compass"></i> Explore</a></li>
+                <li style="position:relative;">
+                    <a href="#" onclick="notify(); return false;"><i class="fa-solid fa-bell"></i> Notifications</a>
+                    <span class="notif-badge" id="notif-badge">0</span>
+                </li>
+                <li><a href="#" onclick="message(); return false;"><i class="fa-solid fa-paper-plane"></i> Messages</a></li>
+                <li><a href="#" onclick="themes(); return false;"><i class="fa-solid fa-palette"></i> Themes</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+            <button style="margin-top:2rem;" onclick="postcreate(); return false;" class="login-button">
+                <i class="fa-solid fa-plus"></i> Create Post
+            </button>
+        </div>
+
+        <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+        <!-- ══════════════════════════════════════════
+             NOTIFICATIONS PANEL
+        ══════════════════════════════════════════ -->
+        <div class="page notifications" id="notifications">
+            <div class="notifications-header">
+                <h3>Notifications</h3>
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding: 0 0.5rem;gap:1rem;">
+                <h4 class="requestheading">Activity</h4>
+            </div>
+            <div id="notifications-list">
+                <div class="spinner"><i class="fa-solid fa-spinner"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             MAIN FEED
+        ══════════════════════════════════════════ -->
+        <div class="page main-content" id="main-content">
+            <!-- Explore tabs shown when in explore mode -->
+            <div id="explore-tabs" style="display:none; width:100%;">
+                <div class="explore-tabs">
+                    <button class="explore-tab active" onclick="switchExploreTab('posts', this)">Posts</button>
+                    <button class="explore-tab" onclick="switchExploreTab('people', this)">People</button>
+                </div>
+            </div>
+            <div id="feed-container">
+                <div class="spinner"><i class="fa-solid fa-spinner"></i> Loading feed...</div>
+            </div>
+            <!-- Load more -->
+            <div id="load-more-wrap" style="text-align:center; padding: 1rem; display:none;">
+                <button class="login-button" style="width:auto; padding: 8px 24px;" onclick="loadMoreFeed()">
+                    Load more
+                </button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             MESSAGES PANEL
+        ══════════════════════════════════════════ -->
+        <div class="page messages" id="messages">
+            <div class="messages-header">
+                <h3>Messages</h3>
+                <i class="fa-solid fa-pen-to-square" style="cursor:pointer;" onclick="newMessage()"></i>
+            </div>
+            <div id="conversations-list">
+                <div class="spinner"><i class="fa-solid fa-spinner"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             CHAT BOX
+        ══════════════════════════════════════════ -->
+        <div id="chat" class="hide page chat" style="display:none; flex-direction:column; height:100%;">
+            <div class="chat-header">
+                <i class="fa-solid fa-arrow-left" onclick="goBack()" style="cursor:pointer; padding:8px;"></i>
+                <img src="" alt="chat" class="chatboximg" id="chat-avatar">
+                <div style="flex:1;">
+                    <p id="chat-name" style="margin:0; font-weight:600;"></p>
+                    <small id="chat-status" style="font-size:0.75rem; opacity:0.8;"></small>
+                </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="typing-indicator" id="typing-indicator">
+                <i class="fa-solid fa-ellipsis fa-beat"></i> <span id="typing-name"></span> is typing...
+            </div>
+            <div class="chat-input-row">
+                <button class="add-btn" onclick="pickChatFile()" title="Attach file">
+                    <i class="fa-solid fa-plus" style="color:#666;"></i>
+                </button>
+                <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="chatKeyPress(event)">
+                <button class="chat-send-btn" onclick="sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+                <input type="file" id="chat-file-input" style="display:none" accept="image/*,video/*" onchange="sendFileMessage()">
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             PROFILE CARD
+        ══════════════════════════════════════════ -->
+        <div class="hide page profilecard" id="profilecard">
+            <div class="profileimg">
+                <img src="images/userprofile.jpg" alt="profile" class="profile-img" id="profilecard-avatar">
+                <h4 id="profilecard-name">Loading...</h4>
+                <p id="profilecard-username" style="color:#888; font-size:0.85rem;"></p>
+                <p id="profilecard-bio" style="font-size:0.82rem; color:#555; text-align:center; margin: 4px 0;"></p>
+            </div>
+            <div class="profileinfo">
+                <div class="info profile-stat" onclick="showFollowers()">
+                    <h5 id="profilecard-posts">0</h5>
+                    <p>Posts</p>
+                </div>
+                <div class="info profile-stat" onclick="showFollowers()">
+                    <h5 id="profilecard-followers">0</h5>
+                    <p>Followers</p>
+                </div>
+                <div class="info profile-stat" onclick="showFollowing()">
+                    <h5 id="profilecard-following">0</h5>
+                    <p>Following</p>
+                </div>
+            </div>
+            <div class="profilebtn" id="profilecard-btns">
+                <button class="followbtn" id="follow-btn" onclick="toggleFollow()">Follow</button>
+                <button class="messagebtn" onclick="messageUser()">Message</button>
+            </div>
+            <!-- User's posts grid -->
+            <div style="width:100%;">
+                <p style="font-size:0.82rem; font-weight:600; color:#555; margin-bottom:6px;">Posts</p>
+                <div class="profile-posts-grid" id="profilecard-posts-grid">
+                    <div class="no-posts"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             CREATE POST
+        ══════════════════════════════════════════ -->
+        <div id="post-creation" class="hide chat post" style="flex-direction:column; gap:1rem; padding:1rem;">
+            <p style="font-weight:600; font-size:1rem;">Create New Post</p>
+            <div style="width:100%;">
+                <textarea id="post-text" placeholder="What's on your mind?"
+                    style="width:100%; border-radius:12px; padding:12px; border:1.5px solid #ddd;
+                    font-family:inherit; font-size:0.95rem; resize:vertical; min-height:100px;
+                    outline:none; box-sizing:border-box;"
+                    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
+            </div>
+            <!-- Image preview -->
+            <div id="post-image-preview" style="display:none;">
+                <img id="post-preview-img" style="max-width:100%; border-radius:10px; max-height:200px; object-fit:cover;">
+                <button onclick="clearPostImage()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.85rem; margin-top:4px;">
+                    <i class="fa-solid fa-times"></i> Remove image
+                </button>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button onclick="pickPostFile()" style="background:none; border:1.5px solid #ddd; border-radius:20px; padding:6px 14px; cursor:pointer; font-size:0.85rem; color:#555;">
+                    <i class="fa-solid fa-image"></i> Photo/Video
+                </button>
+                <select id="post-visibility" style="border-radius:20px; border:1.5px solid #ddd; padding:6px 10px; font-size:0.85rem; outline:none;">
+                    <option value="public">🌍 Everyone</option>
+                    <option value="followers">👥 Followers</option>
+                    <option value="private">🔒 Only Me</option>
+                </select>
+                <button class="login-button" onclick="submitPost()"
+                    style="width:auto; padding:8px 20px; margin:0; margin-left:auto;">
+                    Post
+                </button>
+            </div>
+            <input type="file" id="post-file-input" style="display:none" accept="image/*,video/*" onchange="previewPostFile(this)">
+        </div>
+
+    </div><!-- /dashboard-container -->
+</div><!-- /home-container -->
+
+<script src="api-client.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
