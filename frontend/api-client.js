@@ -3,7 +3,7 @@
  * Connects the existing frontend UI to the Node.js/Express backend
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://connectpro-social-media-platform.onrender.com/api';
 
 // ─── HTTP HELPERS ─────────────────────────────────────────────────────────────
 const request = async (method, endpoint, data = null, isFormData = false) => {
@@ -480,7 +480,7 @@ const initSocket = () => {
 };
 
 const connectSocket = (token) => {
-  socket = io('http://localhost:5000', {
+  socket = io('https://connectpro-social-media-platform.onrender.com', {
     auth: { token },
     transports: ['websocket'],
     reconnection: true,
