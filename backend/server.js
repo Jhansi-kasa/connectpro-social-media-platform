@@ -82,10 +82,6 @@ app.use((req, res, next) => {
   next();
 });
 // General middleware
-const cors = require("cors");
-
-app.set("trust proxy", 1);
-
 app.use(cors({
   origin: "https://connectpro-social-media-platform.vercel.app",
   credentials: true,
