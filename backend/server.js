@@ -36,6 +36,7 @@ const adminRoutes = require('./routes/admin');
 const followRoutes = require('./routes/follows');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 // Socket.io
@@ -53,7 +54,7 @@ app.set('io', io);
 connectDB();
 
 // Security middleware
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+//app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(mongoSanitize());
 app.use(xssClean());
 app.use(hpp());
@@ -74,27 +75,24 @@ const authLimiter = rateLimit({
   max: 1000,
   message: { success: false, message: 'Too many login attempts, please try again after 15 minutes.' },
 });
-
+app.use((req, res, next) => {
+  console.log("Origin:", req.headers.origin);
+  console.log("Method:", req.method);
+  console.log("URL:", req.url);
+  next();
+});
 // General middleware
-const allowedOrigins = [
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'https://connectpro-social-media-platform.vercel.app'
-];
+const cors = require("cors");
+
+app.set("trust proxy", 1);
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (Postman, mobile apps, etc.)
-    if (!origin) return callback(null, true);
+  origin: "https://connectpro-social-media-platform.vercel.app",
+  credentials: true,
+}));
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  },
+app.options("*", cors({
+  origin: "https://connectpro-social-media-platform.vercel.app",
   credentials: true,
 }));
 app.use(compression());
